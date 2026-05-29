@@ -227,6 +227,7 @@ def run(context=None):
             "features",
             "biomes",
             "functions",
+            "item_catalog",
         ]
         
         # Check for behavior directory
