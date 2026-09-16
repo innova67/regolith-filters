@@ -12,7 +12,7 @@ Runs 9 checks across BP and RP:
 | `manifest-product-type` | error | Both manifests have `metadata.product_type = "addon"` |
 | `manifest-dependencies` | error | BP depends on RP's UUID and RP depends on BP's UUID |
 | `no-runtime-identifier` | error | No `runtime_identifier` field in any entity file (Partner Program prohibition) |
-| `namespace-format` | error | Entity IDs use `ns.name` dot notation, block IDs use `ns:name` colon notation, no `minecraft:` vanilla overrides |
+| `namespace-format` | error | Entity, client entity and block IDs use `ns:name` colon notation (the only form Minecraft resolves), no `minecraft:` vanilla overrides |
 | `texture-paths` | error / warning | No loose files in `textures/` root, no vanilla directory overrides, custom textures in `textures/chillcraft/{project}/` |
 | `no-experimental` | error | No `use_beta_features: true`, no experimental capabilities, no `is_experimental: true` in entity files |
 | `file-count-limit` | warning → error | Total BP + RP file count stays under 3,500 (warns at 3,150) |
