@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import { Check, LintContext, LintIssue } from "./types";
+import { manifestPackScope } from "./checks/manifest-pack-scope";
 import { manifestProductType } from "./checks/manifest-product-type";
 import { manifestDependencies } from "./checks/manifest-dependencies";
 import { noRuntimeIdentifier } from "./checks/no-runtime-identifier";
@@ -9,8 +10,10 @@ import { texturePaths } from "./checks/texture-paths";
 import { fileCountLimit } from "./checks/file-count-limit";
 import { sizeLimit } from "./checks/size-limit";
 import { noExperimental } from "./checks/no-experimental";
+import { strictFormat } from "./checks/strict-format";
 
 const CHECKS: Check[] = [
+  manifestPackScope,
   manifestProductType,
   manifestDependencies,
   noRuntimeIdentifier,
@@ -19,6 +22,7 @@ const CHECKS: Check[] = [
   fileCountLimit,
   sizeLimit,
   noExperimental,
+  strictFormat,
 ];
 
 interface LintConfig {

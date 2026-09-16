@@ -1,5 +1,5 @@
 export type Severity = "error" | "warning";
-export type Scope = "manifest" | "entity" | "texture" | "filesystem" | "namespace";
+export type Scope = "manifest" | "entity" | "texture" | "filesystem" | "namespace" | "format";
 
 export interface LintContext {
   bpDir: string;

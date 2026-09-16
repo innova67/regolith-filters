@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const fs = require("fs");
+const manifest_pack_scope_1 = require("./checks/manifest-pack-scope");
 const manifest_product_type_1 = require("./checks/manifest-product-type");
 const manifest_dependencies_1 = require("./checks/manifest-dependencies");
 const no_runtime_identifier_1 = require("./checks/no-runtime-identifier");
@@ -10,7 +11,9 @@ const texture_paths_1 = require("./checks/texture-paths");
 const file_count_limit_1 = require("./checks/file-count-limit");
 const size_limit_1 = require("./checks/size-limit");
 const no_experimental_1 = require("./checks/no-experimental");
+const strict_format_1 = require("./checks/strict-format");
 const CHECKS = [
+    manifest_pack_scope_1.manifestPackScope,
     manifest_product_type_1.manifestProductType,
     manifest_dependencies_1.manifestDependencies,
     no_runtime_identifier_1.noRuntimeIdentifier,
@@ -19,6 +22,7 @@ const CHECKS = [
     file_count_limit_1.fileCountLimit,
     size_limit_1.sizeLimit,
     no_experimental_1.noExperimental,
+    strict_format_1.strictFormat,
 ];
 function parseConfig(raw) {
     if (typeof raw !== "object" || raw === null)

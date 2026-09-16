@@ -4,7 +4,7 @@ Regolith filter that validates your Behavior Pack and Resource Pack against Chil
 
 ## What it does
 
-Runs 9 checks across BP and RP:
+Runs 10 checks across BP and RP:
 
 | Check | Severity | What it validates |
 |---|---|---|
@@ -17,6 +17,7 @@ Runs 9 checks across BP and RP:
 | `no-experimental` | error | No `use_beta_features: true`, no experimental capabilities, no `is_experimental: true` in entity files |
 | `file-count-limit` | warning → error | Total BP + RP file count stays under 3,500 (warns at 3,150) |
 | `size-limit` | warning → error | Total BP + RP size stays under 25 MB (warns at 22.5 MB) |
+| `strict-format` | error | Syntax the game rejects with `format_version` ≥ 1.26.30 although the Blockception schemas and Microsoft Learn still accept it: `replace_biomes.targets` without namespace; range fields (`hover_height`, `cooldown_range`, `look_time`, `float_duration`, `branch_interval`, `trunk_height`, `height_distribution`) as arrays, or `{range_min, range_max}` in entities / `{min, max}` in features; boolean `ambient_occlusion` in `material_instances`; `min_height_for_canopy` inside `mega_trunk`; `minecraft:pushable`. Hand-maintained list fed by each content log |
 
 Errors stop the build (`exit 1`). Warnings are printed but do not stop it.
 
