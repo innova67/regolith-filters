@@ -5,6 +5,11 @@ import shutil
 import json
 import sys
 
+# Mapa original -> abreviado (rutas relativas al directorio de trabajo de Regolith),
+# escrito en ./data/abbreviation_map.json al final para que las herramientas que leen el
+# content log de Minecraft puedan deshacer las abreviaturas.
+RENAME_MAP: dict[str, str] = {}
+
 """
 Regolith filter to reduce JSON behavior filenames.
 
@@ -118,6 +123,7 @@ def process_directory(directory: Path, ignored_dirs=None):
         # Rename the file
         print(f"Renaming: {json_file.name} -> {new_name}")
         shutil.move(str(json_file), str(new_path))
+        RENAME_MAP[json_file.as_posix()] = new_path.as_posix()
     
     # Process subdirectories
     for subdir in directory.iterdir():
@@ -190,6 +196,7 @@ def process_directory_with_file_ignore(directory: Path, ignored_dirs=None, ignor
         # Rename the file
         print(f"Renaming: {json_file.name} -> {new_name}")
         shutil.move(str(json_file), str(new_path))
+        RENAME_MAP[json_file.as_posix()] = new_path.as_posix()
     
     # Process subdirectories
     for subdir in directory.iterdir():
@@ -255,7 +262,10 @@ def run(context=None):
             "textures",
             "texts",
             "sounds",
-            "particles"
+            "particles",
+            # Minecraft exige que el nombre del client biome coincida con su identifier
+            "biomes",
+            "fogs",
         ]
         
         # Define files to ignore in RP
@@ -273,6 +283,20 @@ def run(context=None):
         process_directory_with_file_ignore(rp_dir, rp_ignored_dirs, rp_ignored_files)
     else:
         print(f"RP directory not found")
+
+    write_rename_map()
+
+def write_rename_map():
+    """Escribe ./data/abbreviation_map.json (Regolith copia data/ de vuelta al proyecto)."""
+    data_dir = Path("./data")
+    if not data_dir.exists():
+        print("data directory not found; abbreviation_map.json not written")
+        return
+    map_path = data_dir / "abbreviation_map.json"
+    with map_path.open("w", encoding="utf-8") as f:
+        json.dump(RENAME_MAP, f, indent=2, sort_keys=True)
+        f.write("\n")
+    print(f"Wrote {map_path} ({len(RENAME_MAP)} entries)")
 
 # The filter can be run directly for testing
 if __name__ == "__main__":

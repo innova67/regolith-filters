@@ -67,16 +67,17 @@ This filter takes no settings — it applies the same abbreviation rules everywh
 
 **BP ignored directories** — these folders are left untouched:
 
-`loot_tables`, `trading`, `scripts`, `structures`, `texts`, `feature_rules`, `features`, `biomes`
+`loot_tables`, `trading`, `scripts`, `structures`, `texts`, `feature_rules`, `features`, `biomes`, `functions`, `item_catalog`
 
 **RP ignored directories** — left untouched:
 
-`textures`, `texts`, `sounds`, `particles`
+`textures`, `texts`, `sounds`, `particles`, `biomes`, `fogs` (Minecraft requires a client biome file to be named after its identifier)
 
 **RP ignored files** — always kept as-is:
 
-`manifest.json`, `sounds.json`, `blocks.json`
+`manifest.json`, `sounds.json`, `blocks.json`, `biomes_client.json`, `_ui_defs.json`, `music_definitions.json`
 
 - `manifest.json` is always skipped in BP as well.
 - Only `.json` filenames are changed — folder names are never modified.
-- Requires Python 3.8+.
+- Every build writes `data/abbreviation_map.json` (`original path -> abbreviated path`, relative to the Regolith working dir). Regolith copies `data/` back to the project's `dataPath`, so tools that read Minecraft's content log can map `BP/blocks/tl.json` back to `BP/blocks/titan_leaves.block.json`. Add it to `.gitignore`.
+- Requires Python 3.9+.
