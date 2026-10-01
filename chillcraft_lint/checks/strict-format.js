@@ -9,7 +9,10 @@ const ID = "strict-format";
  * Blockception y Microsoft Learn todavía aceptan. Lista mantenida a mano: cada content log
  * nuevo que muestre un patrón repetible añade una regla aquí.
  *
- * Fuente: tres rondas de content log de Biosphere (cc_bio, MC 1.26.50, 2026-09-15/16).
+ * Fuentes: tres rondas de content log de Biosphere (cc_bio, MC 1.26.50, 2026-09-15/16) y los
+ * changelogs oficiales de Bedrock 26.40 y 26.50 (feedback.minecraft.net, "Technical Updates"):
+ * solo se añaden reglas que el changelog enuncia de forma explícita, cada una con la
+ * format_version a partir de la cual aplica.
  */
 /**
  * Campos de rango que con format_version >= 1.26.30 deben ser objeto, no array.
@@ -28,6 +31,8 @@ exports.RANGE_FIELDS = new Set([
     // [rango, peso] y el array es correcto (verificado en Biosphere HEAD, carga limpio en 1.26.50).
 ]);
 const MIN_VERSION = [1, 26, 30];
+const V1_26_40 = [1, 26, 40];
+const V1_26_50 = [1, 26, 50];
 function isObject(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -62,11 +67,12 @@ function walkJson(value, keyPath, visit) {
         walkJson(v, p, visit);
     }
 }
-function lintFile(kind, file, data) {
+function lintFile(kind, file, data, version) {
     const issues = [];
-    const push = (message) => {
-        issues.push({ checkId: ID, severity: "error", message, path: file });
+    const push = (message, severity = "error") => {
+        issues.push({ checkId: ID, severity, message, path: file });
     };
+    const since = (min) => atLeast(version, min);
     walkJson(data, [], (key, val, keyPath) => {
         const where = keyPath.join(".");
         // Rangos: array -> objeto; forma del objeto según tipo de archivo.
@@ -104,8 +110,63 @@ function lintFile(kind, file, data) {
         if (kind === "entities" && key === "minecraft:pushable") {
             push(`${where}: minecraft:pushable fue sustituido por minecraft:pushable_by_entity + minecraft:pushable_by_block`);
         }
+        if (kind === "entities")
+            lintEntityKey(key, val, keyPath, where, since, push);
+        // Features (26.50): snap_to_surface_feature renombró vertical_search_range.
+        if (kind === "features" && key === "vertical_search_range" && keyPath.includes("minecraft:snap_to_surface_feature")) {
+            push(`${where}: en 1.26.50 vertical_search_range se renombró a search_range`, "warning");
+        }
     });
     return issues;
+}
+/** Reglas de entidad de los changelogs 26.40 y 26.50 (validación estricta por format_version). */
+function lintEntityKey(key, val, keyPath, where, since, push) {
+    const inRangedAttack = keyPath.includes("minecraft:behavior.ranged_attack");
+    const inProjectile = keyPath.includes("minecraft:projectile");
+    if (since(V1_26_40)) {
+        if (inRangedAttack && (key === "attack_interval_min" || key === "attack_interval_max")) {
+            push(`${where}: desde 1.26.40 ranged_attack usa attack_interval {"min", "max"} en lugar de attack_interval_min/attack_interval_max`);
+        }
+        if (inProjectile && key === "should_bounce" && typeof val === "boolean") {
+            push(`${where}: desde 1.26.40 should_bounce es un enum: "no" | "if_invulnerable" | "if_no_damage_dealt"`);
+        }
+        if (inProjectile && key === "semi_random_diff_damage") {
+            push(`${where}: desde 1.26.40 semi_random_diff_damage se sustituye por difficulty_randomization ("none" | "additive" | "multiplicative")`);
+        }
+        if (key === "scale_previous_velocity" && keyPath.includes("minecraft:apply_knockback_rules")) {
+            push(`${where}: desde 1.26.40 scale_previous_velocity se llama slowdown_scale`);
+        }
+    }
+    if (since(V1_26_50)) {
+        if (inRangedAttack && (key === "attack_radius" || key === "attack_radius_min")) {
+            push(`${where}: desde 1.26.50 ranged_attack usa attack_range {"min", "max"} en lugar de attack_radius_min/attack_radius`);
+        }
+        if (keyPath.includes("minecraft:interact") &&
+            (key === "interactions" || key === "spawn_entities" || key === "play_sounds") &&
+            !Array.isArray(val)) {
+            push(`${where}: desde 1.26.50 minecraft:interact solo acepta arrays en interactions, spawn_entities y play_sounds`);
+        }
+        if (inProjectile) {
+            if (key === "anchor" && typeof val === "number") {
+                push(`${where}: desde 1.26.50 anchor es un string: "origin" | "eye_height" | "middle"`);
+            }
+            if ((key === "first_spawn_chance" || key === "second_spawn_chance") && typeof val === "number" && (val < 0 || val > 1)) {
+                push(`${where}: desde 1.26.50 ${key} es una probabilidad entre 0.0 y 1.0`);
+            }
+            if (key === "damage" && keyPath.includes("impact_damage") && Array.isArray(val)) {
+                push(`${where}: desde 1.26.50 impact_damage.damage como rango es {"min", "max"}, no un array`);
+            }
+            if (key === "effects" && keyPath.includes("mob_effects") && !Array.isArray(val)) {
+                push(`${where}: desde 1.26.50 mob_effects.effects es un array`);
+            }
+            if (key === "owner_launch_immunity_ticks") {
+                push(`${where}: owner_launch_immunity_ticks está obsoleto desde 1.26.50 (comprobación espacial automática)`, "warning");
+            }
+        }
+        if (key === "minecraft:uses_legacy_ambient_sounds") {
+            push(`${where}: minecraft:uses_legacy_ambient_sounds está obsoleto; definir las condiciones en minecraft:ambient_sound_interval.event_names`, "warning");
+        }
+    }
 }
 exports.strictFormat = {
     id: ID,
@@ -123,7 +184,7 @@ exports.strictFormat = {
                 const version = parseVersion(data["format_version"]);
                 if (!version || !atLeast(version, MIN_VERSION))
                     continue;
-                issues.push(...lintFile(kind, file, data));
+                issues.push(...lintFile(kind, file, data, version));
             }
         }
         return issues;

@@ -63,6 +63,18 @@ export const namespaceFormat: Check = {
       }
     }
 
+    // BP dimensions (JSON estable desde 1.26.50): identifier propio; nunca redefinir una vanilla
+    const bpDimensions = walkDir(path.join(ctx.bpDir, "dimensions")).filter((f) => f.endsWith(".json"));
+    for (const file of bpDimensions) {
+      const id = extractIdentifier(readJson(file), "minecraft:dimension", "description", "identifier");
+      if (!id) continue;
+      if (id.startsWith("minecraft:")) {
+        issues.push({ checkId: ID, severity: "error", message: `Dimensión usa namespace "minecraft:" — no se modifican dimensiones vanilla; usar "${ns}:"`, path: file });
+      } else if (!id.startsWith(`${ns}:`)) {
+        issues.push({ checkId: ID, severity: "error", message: `Dimensión usa namespace incorrecto "${id}" — esperado "${ns}:{nombre}"`, path: file });
+      }
+    }
+
     return issues;
   },
 };
