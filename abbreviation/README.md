@@ -67,7 +67,7 @@ This filter takes no settings — it applies the same abbreviation rules everywh
 
 **BP ignored directories** — these folders are left untouched:
 
-`loot_tables`, `trading`, `scripts`, `structures`, `texts`, `feature_rules`, `features`, `biomes`, `functions`, `item_catalog`
+`loot_tables`, `trading`, `scripts`, `structures`, `texts`, `feature_rules`, `features`, `biomes`, `dimensions`, `functions`, `item_catalog` (`dimensions`: custom dimension JSON, stable since Minecraft 1.26.50; kept like `biomes` until it is verified that the game does not tie the file name to the identifier)
 
 **RP ignored directories** — left untouched:
 

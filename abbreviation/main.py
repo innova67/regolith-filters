@@ -233,6 +233,7 @@ def run(context=None):
             "feature_rules",
             "features",
             "biomes",
+            "dimensions",
             "functions",
             "item_catalog",
         ]
