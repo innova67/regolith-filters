@@ -1,0 +1,6 @@
+{
+  "type": "commonjs",
+  "dependencies": {
+    "javascript-obfuscator": "5.8.1"
+  }
+}

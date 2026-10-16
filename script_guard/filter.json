@@ -1,0 +1,15 @@
+{
+  "description": "Obfuscates the Behavior Pack scripts with javascript-obfuscator (Minecraft-safe options) and prepends a configurable license notice. Optionally keeps an unobfuscated copy outside the packs for review.",
+  "filters": [
+    {
+      "name": "script_guard",
+      "runWith": "nodejs",
+      "script": "main.js",
+      "settings": {
+        "product": "My Add-On",
+        "owner": "My Studio",
+        "website": "example.com"
+      }
+    }
+  ]
+}
