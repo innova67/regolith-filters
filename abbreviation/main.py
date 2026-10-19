@@ -75,7 +75,7 @@ def process_directory(directory: Path, ignored_dirs=None):
     
     # Check if the directory or its parents should be ignored
     for ignored_dir in ignored_dirs:
-        if ignored_dir in str(directory):
+        if ignored_dir in directory.parts:  # componente exacto: "ui" no debe saltarse "squid" ni "guide"
             print(f"Skipping ignored directory: {directory}")
             return
     
@@ -148,7 +148,7 @@ def process_directory_with_file_ignore(directory: Path, ignored_dirs=None, ignor
     
     # Check if the directory or its parents should be ignored
     for ignored_dir in ignored_dirs:
-        if ignored_dir in str(directory):
+        if ignored_dir in directory.parts:  # componente exacto: "ui" no debe saltarse "squid" ni "guide"
             print(f"Skipping ignored directory: {directory}")
             return
     
@@ -267,6 +267,8 @@ def run(context=None):
             # Minecraft exige que el nombre del client biome coincida con su identifier
             "biomes",
             "fogs",
+            # JSON UI: _ui_defs.json y los overrides de pantallas vanilla (ui/server_form.json) van por ruta
+            "ui",
         ]
         
         # Define files to ignore in RP

@@ -71,7 +71,7 @@ This filter takes no settings — it applies the same abbreviation rules everywh
 
 **RP ignored directories** — left untouched:
 
-`textures`, `texts`, `sounds`, `particles`, `biomes`, `fogs` (Minecraft requires a client biome file to be named after its identifier)
+`textures`, `texts`, `sounds`, `particles`, `biomes`, `fogs` (Minecraft requires a client biome file to be named after its identifier), `ui` (JSON UI: screens are referenced by path from `_ui_defs.json`, and overrides of vanilla screens such as `ui/server_form.json` must keep the vanilla file name)
 
 **RP ignored files** — always kept as-is:
 
